@@ -20,12 +20,12 @@ import android.widget.Button;
  *
  * @see SystemUiHider
  */
-public class LoisPodActivity extends Activity implements View.OnClickListener {
+public class LoisPodActivity extends Activity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
-    private static final boolean AUTO_HIDE = true;
+    private static final boolean AUTO_HIDE = false;
 
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
@@ -59,10 +59,13 @@ public class LoisPodActivity extends Activity implements View.OnClickListener {
     Button mPauseButton;
     Button mSkipButton;
     Button mStopButton;
+    Button mOtherPlayButton;
+    Activity mActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivity = this;
 
         // Experimental Comment
         setContentView(R.layout.activity_lois_pod);
@@ -74,6 +77,8 @@ public class LoisPodActivity extends Activity implements View.OnClickListener {
         // this activity.
         mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
         mSystemUiHider.setup();
+
+/*
         mSystemUiHider
                 .setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
                     // Cached values.
@@ -111,12 +116,25 @@ public class LoisPodActivity extends Activity implements View.OnClickListener {
                         }
                     }
                 });
+*/
 
-/*
+
         // Set up the user interaction to manually show or hide the system UI.
-        contentView.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // Send the correct intent to the MusicService, according to the button that was clicked
+                if (view == mPlayButton) {
+                    Intent i = new Intent(mActivity, MusicService.class);
+                    i.setAction(MusicService.ACTION_PLAY);
+                    startService(i);
+                }
+                else if (view == mStopButton) {
+                    Intent i = new Intent(mActivity, MusicService.class);
+                    i.setAction(MusicService.ACTION_STOP);
+                    startService(i);
+                }
 
                 if (TOGGLE_ON_CLICK) {
                     mSystemUiHider.toggle();
@@ -125,49 +143,37 @@ public class LoisPodActivity extends Activity implements View.OnClickListener {
                 }
 
             }
-        });
-*/
+        };
+        contentView.setOnClickListener(onClickListener);
 
+        View.OnClickListener onControlClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // Send the correct intent to the MusicService, according to the button that was clicked
+                if (view == mPlayButton) {
+                    Intent i = new Intent(mActivity, MusicService.class);
+                    i.setAction(MusicService.ACTION_PLAY);
+                    startService(i);
+                }
+            }
+        };
+        controlsView.setOnClickListener(onControlClickListener);
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-//        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+//        findViewById(R.id.playButton).setOnTouchListener(mDelayHideTouchListener);
 
 
         mPlayButton = (Button) findViewById(R.id.playButton);
-/*
-        mPauseButton = (Button) findViewById(R.id.pausebutton);
-        mSkipButton = (Button) findViewById(R.id.skipbutton);
-*/
         mStopButton = (Button) findViewById(R.id.stopButton);
+        mOtherPlayButton = (Button) findViewById(R.id.theOtherButton);
 
-        mPlayButton.setOnClickListener(this);
-/*
-        mPauseButton.setOnClickListener(this);
-        mSkipButton.setOnClickListener(this);
-*/
-        mStopButton.setOnClickListener(this);
-    }
+        mPlayButton.setOnClickListener(onClickListener);
+        mStopButton.setOnClickListener(onClickListener);
 
-    public void onClick(View target) {
-        // Send the correct intent to the MusicService, according to the button that was clicked
-        if (target == mPlayButton) {
-            Intent i = new Intent(this, MusicService.class);
-            i.setAction(MusicService.ACTION_PLAY);
-            startService(i);
-        }
-/*
-        else if (target == mPauseButton)
-            startService(new Intent(MusicService.ACTION_PAUSE));
-        else if (target == mSkipButton)
-            startService(new Intent(MusicService.ACTION_SKIP));
-*/
-        else if (target == mStopButton) {
-            Intent i = new Intent(this, MusicService.class);
-            i.setAction(MusicService.ACTION_STOP);
-            startService(i);
-        }
+        mOtherPlayButton.setOnClickListener(onControlClickListener);
     }
 
     @Override
@@ -197,7 +203,6 @@ public class LoisPodActivity extends Activity implements View.OnClickListener {
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-/*
     View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -207,7 +212,7 @@ public class LoisPodActivity extends Activity implements View.OnClickListener {
             return false;
         }
     };
-*/
+
 
     Handler mHideHandler = new Handler();
     Runnable mHideRunnable = new Runnable() {
