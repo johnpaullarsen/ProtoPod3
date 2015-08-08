@@ -24,14 +24,6 @@
         android:gravity="bottom"
         android:layout_marginTop="300dp">
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="85dp"
-            android:text="Play"
-            android:id="@+id/theOtherButton"
-            android:background="@color/material_blue_grey_900"
-            android:longClickable="false" />
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

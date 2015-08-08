@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +22,7 @@ import android.widget.Button;
  *
  * @see SystemUiHider
  */
-public class LoisPodActivity extends Activity {
+public class LoisPodActivity extends FragmentActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -49,6 +51,8 @@ public class LoisPodActivity extends Activity {
      */
     private SystemUiHider mSystemUiHider;
 
+    public static final String FRAGTAG = "ImmersiveModeFragment";
+
     /**
      * The URL we suggest as default when adding by URL. This is just so that the user doesn't
      * have to find an URL to test this sample.
@@ -62,6 +66,8 @@ public class LoisPodActivity extends Activity {
     Button mOtherPlayButton;
     Activity mActivity;
 
+    ImmersiveModeFragment fragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,13 +76,24 @@ public class LoisPodActivity extends Activity {
         // Experimental Comment
         setContentView(R.layout.activity_lois_pod);
 
+
+        if (getSupportFragmentManager().findFragmentByTag(FRAGTAG) == null ) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            fragment = new ImmersiveModeFragment();
+            transaction.add(fragment, FRAGTAG);
+            transaction.commit();
+        }
+
+
         final View contentView = findViewById(R.id.fullscreen_content);
         final View controlsView = findViewById(R.id.fullscreen_content_controls);
 
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
+/*
         mSystemUiHider = SystemUiHider.getInstance(this, contentView, HIDER_FLAGS);
         mSystemUiHider.setup();
+*/
 
 /*
         mSystemUiHider
@@ -136,11 +153,14 @@ public class LoisPodActivity extends Activity {
                     startService(i);
                 }
 
+                fragment.toggleHideyBar();
+/*
                 if (TOGGLE_ON_CLICK) {
                     mSystemUiHider.toggle();
                 } else {
                     mSystemUiHider.show();
                 }
+*/
 
             }
         };
@@ -187,6 +207,7 @@ public class LoisPodActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+/*
     @Override
    protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -196,6 +217,7 @@ public class LoisPodActivity extends Activity {
         // are available.
         delayedHide(100);
     }
+*/
 
 
     /**
@@ -203,6 +225,7 @@ public class LoisPodActivity extends Activity {
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
+/*
     View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -212,22 +235,27 @@ public class LoisPodActivity extends Activity {
             return false;
         }
     };
+*/
 
-
+/*
     Handler mHideHandler = new Handler();
+
     Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
             mSystemUiHider.hide();
         }
     };
+*/
 
     /**
      * Schedules a call to hide() in [delay] milliseconds, canceling any
      * previously scheduled calls.
      */
+    /*
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
+    */
 }
