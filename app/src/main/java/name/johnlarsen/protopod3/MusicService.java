@@ -36,6 +36,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -68,6 +69,9 @@ public class MusicService extends Service implements OnCompletionListener, OnPre
     public static final String ACTION_SKIP = "name.johnlarsen.protopod3.action.SKIP";
     public static final String ACTION_REWIND = "name.johnlarsen.protopod3.action.REWIND";
     public static final String ACTION_URL = "name.johnlarsen.protopod3.action.URL";
+
+    public static final String EVENT_NEW_SONG = "name.johnlarsen.protopod3.event.NEW_SONG";
+    public static final String MSG_SONG_TITLE = "name.johnlarsen.protopod3.message.SONG_TITLE";
 
     // The volume we set the media player to when we lose audio focus, but are allowed to reduce
     // the volume instead of stopping playback.
@@ -152,6 +156,7 @@ public class MusicService extends Service implements OnCompletionListener, OnPre
 
     Notification mNotification = null;
 
+    LocalBroadcastManager mBroadcastManager;
     /**
      * Makes sure the media player exists and has been reset. This will create the media player
      * if needed, or reset the existing media player if one already exists.
@@ -180,6 +185,8 @@ public class MusicService extends Service implements OnCompletionListener, OnPre
     @Override
     public void onCreate() {
         Log.i(TAG, "debug: Creating service");
+
+        mBroadcastManager = LocalBroadcastManager.getInstance(this);
 
         // Create the Wifi lock (this does not acquire the lock, this just creates it)
         mWifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
@@ -434,6 +441,10 @@ public class MusicService extends Service implements OnCompletionListener, OnPre
             }
 
             mSongTitle = playingItem.getTitle();
+
+            Intent newSongIntent = new Intent(EVENT_NEW_SONG);
+            newSongIntent.putExtra(MSG_SONG_TITLE, mSongTitle);
+            mBroadcastManager.sendBroadcast(newSongIntent);
 
             mState = State.Preparing;
             setUpAsForeground(mSongTitle + " (loading)");
